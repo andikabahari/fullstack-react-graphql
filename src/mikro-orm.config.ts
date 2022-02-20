@@ -1,11 +1,12 @@
 import { __prod__ } from "./constants";
 import { Post } from "./entities/Post";
+import { User } from "./entities/User";
 import { MikroORM } from "@mikro-orm/core";
 import path from "path";
 console.log("dirname", __dirname);
 
 export default {
-  entities: [Post],
+  entities: [Post, User],
   dbName: "fullstack_react_graphql",
   password: "root",
   type: "postgresql",
