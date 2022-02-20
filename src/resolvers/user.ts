@@ -7,6 +7,7 @@ import {
   InputType,
   Mutation,
   ObjectType,
+  Query,
   Resolver,
 } from "type-graphql";
 import argon2 from "argon2";
@@ -40,10 +41,19 @@ class UserResponse {
 
 @Resolver()
 export class UserResolver {
+  @Query(() => User, { nullable: true })
+  async me(@Ctx() { em, req }: MyContext) {
+    if (!req.session.userId) {
+      return null;
+    }
+    const user = await em.findOne(User, { id: req.session.userId });
+    return user;
+  }
+
   @Mutation(() => UserResponse)
   async register(
     @Arg("input") input: CredentialsInput,
-    @Ctx() { em }: MyContext
+    @Ctx() { em, req }: MyContext
   ): Promise<UserResponse> {
     const { username, password } = input;
 
@@ -92,29 +102,43 @@ export class UserResolver {
       }
     }
 
+    req.session.userId = user.id;
+
     return { user };
   }
 
   @Mutation(() => UserResponse)
   async login(
     @Arg("input") input: CredentialsInput,
-    @Ctx() { em }: MyContext
+    @Ctx() { em, req }: MyContext
   ): Promise<UserResponse> {
     const { username, password } = input;
 
     const user = await em.findOne(User, { username });
     if (!user) {
       return {
-        errors: [{ field: "username", message: "Username doesn't exist." }],
+        errors: [
+          {
+            field: "username",
+            message: "Username doesn't exist.",
+          },
+        ],
       };
     }
 
     const valid = await argon2.verify(user.password, password);
     if (!valid) {
       return {
-        errors: [{ field: "password", message: "Password is incorrect." }],
+        errors: [
+          {
+            field: "password",
+            message: "Password is incorrect.",
+          },
+        ],
       };
     }
+
+    req.session.userId = user.id;
 
     return { user };
   }

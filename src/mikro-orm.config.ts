@@ -3,7 +3,6 @@ import { Post } from "./entities/Post";
 import { User } from "./entities/User";
 import { MikroORM } from "@mikro-orm/core";
 import path from "path";
-console.log("dirname", __dirname);
 
 export default {
   entities: [Post, User],
