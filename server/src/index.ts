@@ -12,7 +12,6 @@ import Redis from "ioredis";
 import session from "express-session";
 import connectRedist from "connect-redis";
 import { MyContext } from "./types";
-import cors from "cors";
 
 declare module "express-session" {
   export interface Session {
