@@ -11,7 +11,7 @@ import { UserResolver } from "./resolvers/user";
 import Redis from "ioredis";
 import session from "express-session";
 import connectRedist from "connect-redis";
-import { MyContext } from "./types";
+import cors from "cors";
 
 declare module "express-session" {
   export interface Session {
@@ -26,7 +26,14 @@ const main = async () => {
   const app = express();
   const port = 5000;
 
-  app.set("trust proxy", true);
+  // app.set("trust proxy", true);
+
+  app.use(
+    cors({
+      origin: "http://localhost:3000",
+      credentials: true,
+    })
+  );
 
   const RedisStore = connectRedist(session);
   const redisClient = new Redis();
@@ -59,17 +66,11 @@ const main = async () => {
       resolvers: [HelloResolver, PostResolver, UserResolver],
       validate: false,
     }),
-    context: ({ req, res }): MyContext => ({ em: orm.em, req, res }),
+    context: ({ req, res }) => ({ em: orm.em, req, res }),
   });
   await apolloServer.start();
 
-  apolloServer.applyMiddleware({
-    app,
-    cors: {
-      origin: "https://studio.apollographql.com",
-      credentials: true,
-    },
-  });
+  apolloServer.applyMiddleware({ app, cors: false });
 
   app.listen(port, () => {
     console.log(`Server running on port ${port}`);
