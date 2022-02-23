@@ -1,13 +1,55 @@
 import { ChakraProvider, ColorModeProvider } from "@chakra-ui/react";
-import { Provider, createClient } from "urql";
+import { cacheExchange, QueryInput, Cache } from "@urql/exchange-graphcache";
+import { Provider, createClient, dedupExchange, fetchExchange } from "urql";
+import {
+  LoginMutation,
+  MeDocument,
+  MeQuery,
+  RegisterMutation,
+} from "../generated/graphql";
 
 import theme from "../theme";
 
+function myUpdateQuery<Result, Query>(
+  cache: Cache,
+  qi: QueryInput,
+  result: any,
+  fn: (r: Result, q: Query) => Query
+) {
+  return cache.updateQuery(qi, (data: any) => fn(result, data as any) as any);
+}
+
 const client = createClient({
   url: "http://localhost:5000/graphql",
-  fetchOptions: {
-    credentials: "include",
-  },
+  fetchOptions: { credentials: "include" },
+  exchanges: [
+    dedupExchange,
+    cacheExchange({
+      updates: {
+        Mutation: {
+          login: (_result: LoginMutation, args, cache, info) => {
+            myUpdateQuery<LoginMutation, MeQuery>(
+              cache,
+              { query: MeDocument },
+              _result,
+              (result, query) =>
+                result.login.errors ? query : { me: result.login.user }
+            );
+          },
+          register: (_result: RegisterMutation, args, cache, info) => {
+            myUpdateQuery<RegisterMutation, MeQuery>(
+              cache,
+              { query: MeDocument },
+              _result,
+              (result, query) =>
+                result.register.errors ? query : { me: result.register.user }
+            );
+          },
+        },
+      },
+    }),
+    fetchExchange,
+  ],
 });
 
 function MyApp({ Component, pageProps }) {
