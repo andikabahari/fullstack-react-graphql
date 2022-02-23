@@ -37,7 +37,7 @@ const client = createClient({
                 result.login.errors ? query : { me: result.login.user }
             );
           },
-          logout: (_result: LoginMutation, args, cache, info) => {
+          logout: (_result: LogoutMutation, args, cache, info) => {
             myUpdateQuery<LogoutMutation, MeQuery>(
               cache,
               { query: MeDocument },
