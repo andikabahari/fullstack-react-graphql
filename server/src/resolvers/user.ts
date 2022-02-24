@@ -4,7 +4,6 @@ import {
   Arg,
   Ctx,
   Field,
-  InputType,
   Mutation,
   ObjectType,
   Query,
@@ -13,15 +12,8 @@ import {
 import argon2 from "argon2";
 import { EntityManager } from "@mikro-orm/postgresql";
 import { COOKIE_NAME } from "../constants";
-
-@InputType()
-class CredentialsInput {
-  @Field()
-  username: string;
-
-  @Field()
-  password: string;
-}
+import { CredentialsInput } from "./CredentialsInput";
+import { validateRegister } from "../utils/validateRegister";
 
 @ObjectType()
 class FieldError {
@@ -57,30 +49,10 @@ export class UserResolver {
     @Arg("input") input: CredentialsInput,
     @Ctx() { em, req }: MyContext
   ): Promise<UserResponse> {
-    const { username, password } = input;
+    const errors = validateRegister(input);
+    if (errors) return { errors };
 
-    if (username.length < 4) {
-      return {
-        errors: [
-          {
-            field: "username",
-            message: "Username must be at least 4 characters.",
-          },
-        ],
-      };
-    }
-
-    if (password.length < 4) {
-      return {
-        errors: [
-          {
-            field: "password",
-            message: "Password must be at least 4 characters.",
-          },
-        ],
-      };
-    }
-
+    const { username, email, password } = input;
     let user;
     try {
       const hashedPassword = await argon2.hash(password);
@@ -89,6 +61,7 @@ export class UserResolver {
         .getKnexQuery()
         .insert({
           username,
+          email,
           password: hashedPassword,
           created_at: new Date(),
           updated_at: new Date(),
@@ -115,18 +88,22 @@ export class UserResolver {
 
   @Mutation(() => UserResponse)
   async login(
-    @Arg("input") input: CredentialsInput,
+    @Arg("usernameOrEmail") usernameOrEmail: string,
+    @Arg("password") password: string,
     @Ctx() { em, req }: MyContext
   ): Promise<UserResponse> {
-    const { username, password } = input;
-
-    const user = await em.findOne(User, { username });
+    const user = await em.findOne(
+      User,
+      usernameOrEmail.includes("@")
+        ? { email: usernameOrEmail }
+        : { username: usernameOrEmail }
+    );
     if (!user) {
       return {
         errors: [
           {
-            field: "username",
-            message: "Username doesn't exist.",
+            field: "usernameOrEmail",
+            message: "Username or email doesn't exist.",
           },
         ],
       };
