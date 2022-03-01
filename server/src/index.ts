@@ -36,7 +36,7 @@ const main = async () => {
   );
 
   const RedisStore = connectRedist(session);
-  const redisClient = new Redis();
+  const redis = new Redis();
 
   const oneDay = 1000 * 60 * 60 * 24;
   const maxAge = 30 * oneDay;
@@ -44,7 +44,7 @@ const main = async () => {
     session({
       name: COOKIE_NAME,
       store: new RedisStore({
-        client: redisClient,
+        client: redis,
         disableTouch: true,
       }),
       cookie: {
@@ -64,7 +64,7 @@ const main = async () => {
       resolvers: [HelloResolver, PostResolver, UserResolver],
       validate: false,
     }),
-    context: ({ req, res }) => ({ em: orm.em, req, res }),
+    context: ({ req, res }) => ({ em: orm.em, req, res, redis }),
   });
   await apolloServer.start();
 
