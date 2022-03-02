@@ -59,7 +59,7 @@ const main = async () => {
         maxAge,
         httpOnly: true,
         secure: __prod__, // https
-        sameSite: "lax", // csrf
+        sameSite: __prod__ ? "lax" : "none", // csrf
       },
       saveUninitialized: false,
       secret: "keyboard cat",
