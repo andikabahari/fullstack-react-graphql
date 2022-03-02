@@ -18,8 +18,8 @@ export async function sendEmail(options: MailOptions) {
     port: 587,
     secure: false, // true for 465, false for other ports
     auth: {
-      user: "sxgo6isn43tlua6p@ethereal.email",
-      pass: "Q42sg5sTave8mNQzRN",
+      user: "swevpc3uszvbuk5r@ethereal.email",
+      pass: "r6nSH3frfMmNSdRvnf",
     },
   });
 

@@ -153,8 +153,9 @@ export class UserResolver {
     const oneDay = 1000 * 60 * 60 * 24;
     redis.set(FORGET_PASSWORD_PREFIX + token, user.id, "ex", 3 * oneDay);
     const html = `<a href="http://localhost:3000/change-password/${token}">Reset password</a>`;
+    console.log("sending email...");
     await sendEmail({
-      from: "Euy",
+      from: "My website",
       to: email,
       subject: "Reset password",
       html,

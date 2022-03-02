@@ -27,7 +27,7 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({}) => {
           ) : (
             <Form>
               <InputField
-                name="Email"
+                name="email"
                 label="Email"
                 placeholder="Email"
                 type="email"
