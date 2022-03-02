@@ -1,7 +1,5 @@
 import "reflect-metadata";
-import { MikroORM } from "@mikro-orm/core";
 import { COOKIE_NAME, __prod__ } from "./constants";
-import mikroOrmConfig from "./mikro-orm.config";
 import express from "express";
 import { ApolloServer } from "apollo-server-express";
 import { buildSchema } from "type-graphql";
@@ -12,6 +10,9 @@ import Redis from "ioredis";
 import session from "express-session";
 import connectRedist from "connect-redis";
 import cors from "cors";
+import { createConnection } from "typeorm";
+import { Post } from "./entities/Post";
+import { User } from "./entities/User";
 
 declare module "express-session" {
   export interface Session {
@@ -20,8 +21,15 @@ declare module "express-session" {
 }
 
 const main = async () => {
-  const orm = await MikroORM.init(mikroOrmConfig);
-  await orm.getMigrator().up();
+  const conn = await createConnection({
+    type: "postgres",
+    database: "fullstack_react_graphql",
+    username: "postgres",
+    password: "root",
+    logging: true,
+    synchronize: true,
+    entities: [Post, User],
+  });
 
   const app = express();
   const port = 5000;
@@ -30,7 +38,7 @@ const main = async () => {
 
   app.use(
     cors({
-      origin: "http://localhost:3000",
+      origin: ["http://localhost:3000", "https://studio.apollographql.com"],
       credentials: true,
     })
   );
@@ -64,15 +72,13 @@ const main = async () => {
       resolvers: [HelloResolver, PostResolver, UserResolver],
       validate: false,
     }),
-    context: ({ req, res }) => ({ em: orm.em, req, res, redis }),
+    context: ({ req, res }) => ({ req, res, redis }),
   });
   await apolloServer.start();
 
   apolloServer.applyMiddleware({ app, cors: false });
 
-  app.listen(port, () => {
-    console.log(`Server running on port ${port}`);
-  });
+  app.listen(port, () => console.log(`Server running on port ${port}`));
 };
 
 main().catch((err) => console.log(err));
