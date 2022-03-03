@@ -39,6 +39,7 @@ const Login: React.FC<LoginProps> = ({}) => {
                 name="password"
                 label="Password"
                 placeholder="Password"
+                type="password"
               />
             </Box>
             <Flex>
