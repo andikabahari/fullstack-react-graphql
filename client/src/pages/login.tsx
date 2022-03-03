@@ -22,9 +22,15 @@ const Login: React.FC<LoginProps> = ({}) => {
         onSubmit={async (values, { setErrors }) => {
           const response = await login(values);
           let errors;
-          if ((errors = response.data?.login.errors))
+          if ((errors = response.data?.login.errors)) {
             setErrors(toErrorMap(errors));
-          if (response.data?.login.user) router.push("/");
+          } else if (response.data?.login.user) {
+            if (typeof router.query.next === "string") {
+              router.push(router.query.next);
+              return;
+            }
+            router.push("/");
+          }
         }}
       >
         {({ isSubmitting }) => (
