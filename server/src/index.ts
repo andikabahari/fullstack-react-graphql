@@ -13,6 +13,7 @@ import cors from "cors";
 import { createConnection } from "typeorm";
 import { Post } from "./entities/Post";
 import { User } from "./entities/User";
+import path from "path";
 
 declare module "express-session" {
   export interface Session {
@@ -28,8 +29,11 @@ const main = async () => {
     password: "root",
     logging: true,
     synchronize: true,
+    migrations: [path.join(__dirname, "./migrations/*")],
     entities: [Post, User],
   });
+
+  await conn.runMigrations();
 
   const app = express();
   const port = 5000;
