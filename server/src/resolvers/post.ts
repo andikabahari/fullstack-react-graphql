@@ -9,8 +9,8 @@ import {
   Resolver,
   UseMiddleware,
 } from "type-graphql";
-import { MyContext } from "src/types";
-import { isAuth } from "src/middlewares/isAuth";
+import { MyContext } from "../types";
+import { isAuth } from "../middlewares/isAuth";
 
 @InputType()
 class PostInput {
