@@ -15,7 +15,7 @@ import {
 } from "type-graphql";
 import { MyContext } from "../types";
 import { isAuth } from "../middlewares/isAuth";
-import { Db, getConnection } from "typeorm";
+import { getConnection } from "typeorm";
 
 @InputType()
 class PostInput {
