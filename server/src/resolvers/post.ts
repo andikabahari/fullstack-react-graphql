@@ -16,6 +16,7 @@ import {
 import { MyContext } from "../types";
 import { isAuth } from "../middlewares/isAuth";
 import { getConnection } from "typeorm";
+import { Upvote } from "../entities/Upvote";
 
 @InputType()
 class PostInput {
@@ -52,14 +53,30 @@ export class PostResolver {
   ) {
     const { userId } = req.session;
     const realValue = value !== -1 ? 1 : -1;
-    await getConnection().query(
-      `
-        start transaction;
-        insert into upvote ("userId", "postId", value) values (${userId}, ${postId}, ${realValue});
-        update post set points = points + ${realValue} where post.id = ${postId};
-        commit;
-      `
-    );
+    const upvote = await Upvote.findOne({ where: { postId, userId } });
+    if (upvote && upvote.value !== realValue) {
+      await getConnection().transaction(async (tm) => {
+        await tm.query(
+          `update upvote set value = $1 where "postId" = $2 and "userId" = $3`,
+          [realValue, postId, userId]
+        );
+        await tm.query(
+          `update post set points = points + $1 where post.id = $2`,
+          [2 * realValue, postId]
+        );
+      });
+    } else if (!upvote) {
+      await getConnection().transaction(async (tm) => {
+        await tm.query(
+          `insert into upvote ("userId", "postId", value) values ($1, $2, $3)`,
+          [userId, postId, realValue]
+        );
+        await tm.query(
+          `update post set points = points + $1 where post.id = $2`,
+          [realValue, postId]
+        );
+      });
+    }
     return true;
   }
 
