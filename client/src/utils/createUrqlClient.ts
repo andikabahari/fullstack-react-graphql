@@ -11,10 +11,12 @@ import {
   MeDocument,
   LogoutMutation,
   RegisterMutation,
+  VoteMutationVariables,
 } from "../generated/graphql";
 import { myUpdateQuery } from "./myUpdateQuery";
 import { pipe, tap } from "wonka";
 import Router from "next/router";
+import gql from "graphql-tag";
 
 const errorExchange: Exchange =
   ({ forward }) =>
@@ -115,6 +117,30 @@ export const createUrqlClient = (ssrExchange: any) => ({
             fieldInfos.forEach((info) => {
               cache.invalidate("Query", "posts", info.arguments);
             });
+          },
+          vote: (_result, args, cache, info) => {
+            const { postId, value } = args as VoteMutationVariables;
+            const data = cache.readFragment(
+              gql`
+                fragment _ on Post {
+                  id
+                  points
+                }
+              `,
+              { id: postId } as any
+            );
+            if (data) {
+              const newPoints = data.points + value;
+              cache.writeFragment(
+                gql`
+                  fragment _ on Post {
+                    id
+                    points
+                  }
+                `,
+                { id: postId, points: newPoints } as any
+              );
+            }
           },
         },
       },
