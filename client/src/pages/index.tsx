@@ -28,12 +28,6 @@ const Index = () => {
 
   return (
     <Layout>
-      <Flex mb={8} alignItems="center">
-        <Heading>Post List</Heading>
-        <NextLink href="/create-post">
-          <Link ml="auto">Create a new post</Link>
-        </NextLink>
-      </Flex>
       {!fetching && data ? (
         <Stack spacing={8}>
           {data.posts.posts.map((post) => (
