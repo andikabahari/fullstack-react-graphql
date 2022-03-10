@@ -12,7 +12,6 @@ type LoadingStatus = "upvote-loading" | "downvote-loading" | "not-loading";
 const UpvoteSection: React.FC<UpvoteSectionProps> = ({ post }) => {
   const [loading, setLoading] = useState<LoadingStatus>("not-loading");
   const [, vote] = useVoteMutation();
-  console.log(post.voteStatus);
 
   return (
     <Flex
