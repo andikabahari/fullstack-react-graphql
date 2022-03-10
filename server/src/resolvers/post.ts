@@ -88,10 +88,8 @@ export class PostResolver {
   ): Promise<PaginatedPosts> {
     const { userId } = req.session;
     const realLimit = Math.min(50, limit);
-    const replacements: any[] = [realLimit + 1, userId];
-    if (cursor) {
-      replacements.push(new Date(parseInt(cursor)));
-    }
+    const replacements: any[] = [realLimit + 1];
+    if (cursor) replacements.push(new Date(parseInt(cursor)));
     const posts = await getConnection().query(
       `
         select
@@ -105,12 +103,12 @@ export class PostResolver {
           ) creator,
           ${
             userId
-              ? `(select value from upvote where "userId" = $2 and "postId" = p.id) "voteStatus"`
+              ? `(select value from upvote where "userId" = ${userId} and "postId" = p.id) "voteStatus"`
               : `null as "voteStatus"`
           }
         from post p
         inner join public.user u on u.id = p."creatorId"
-        ${cursor ? `where p."createdAt" < $3` : ""}
+        ${cursor ? `where p."createdAt" < $2` : ""}
         order by p."createdAt" DESC
         limit $1
     `,
