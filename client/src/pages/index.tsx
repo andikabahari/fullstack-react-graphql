@@ -33,31 +33,33 @@ const Index = () => {
     <Layout>
       {!fetching && data ? (
         <Stack spacing={8}>
-          {data.posts.posts.map((post) => (
-            <Flex key={post.id} p={5} shadow="md" borderWidth="1px">
-              <Box>
-                <UpvoteSection post={post} />
-              </Box>
-              <Box flex={1}>
-                <NextLink href="/post/[id]" as={`/post/${post.id}`}>
-                  <Link>
-                    <Heading fontSize="xl">{post.title}</Heading>
-                  </Link>
-                </NextLink>
-                <Text>Posted by {post.creator.username}</Text>
-                <Text mt={4}>{post.textSnippet}</Text>
-              </Box>
-              <Flex alignItems="center">
-                <IconButton
-                  onClick={() => deletePost({ id: post.id })}
-                  colorScheme="red"
-                  variant="outline"
-                  aria-label="Delete post"
-                  icon={<DeleteIcon />}
-                />
+          {data.posts.posts.map((post) =>
+            !post ? null : (
+              <Flex key={post.id} p={5} shadow="md" borderWidth="1px">
+                <Box>
+                  <UpvoteSection post={post} />
+                </Box>
+                <Box flex={1}>
+                  <NextLink href="/post/[id]" as={`/post/${post.id}`}>
+                    <Link>
+                      <Heading fontSize="xl">{post.title}</Heading>
+                    </Link>
+                  </NextLink>
+                  <Text>Posted by {post.creator.username}</Text>
+                  <Text mt={4}>{post.textSnippet}</Text>
+                </Box>
+                <Flex alignItems="center">
+                  <IconButton
+                    onClick={() => deletePost({ id: post.id })}
+                    colorScheme="red"
+                    variant="outline"
+                    aria-label="Delete post"
+                    icon={<DeleteIcon />}
+                  />
+                </Flex>
               </Flex>
-            </Flex>
-          ))}
+            )
+          )}
         </Stack>
       ) : (
         <div>loading...</div>
