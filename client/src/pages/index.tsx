@@ -10,7 +10,11 @@ import {
 } from "@chakra-ui/react";
 import { withUrqlClient } from "next-urql";
 import Layout from "../components/Layout";
-import { useDeletePostMutation, usePostsQuery } from "../generated/graphql";
+import {
+  useDeletePostMutation,
+  useMeQuery,
+  usePostsQuery,
+} from "../generated/graphql";
 import { createUrqlClient } from "../utils/createUrqlClient";
 import NextLink from "next/link";
 import { useState } from "react";
@@ -24,6 +28,7 @@ const Index = () => {
   });
   const [{ data, fetching }] = usePostsQuery({ variables });
   const [, deletePost] = useDeletePostMutation();
+  const [{ data: meData }] = useMeQuery();
 
   if (!fetching && !data) {
     return <div>query failed</div>;
@@ -48,20 +53,25 @@ const Index = () => {
                   <Text>Posted by {post.creator.username}</Text>
                   <Text mt={4}>{post.textSnippet}</Text>
                 </Box>
-                <Flex alignItems="center">
-                  <NextLink href="/post/edit/[id]" as={`/post/edit/${post.id}`}>
+                {meData?.me?.id !== post.creator.id ? null : (
+                  <Flex alignItems="center">
+                    <NextLink
+                      href="/post/edit/[id]"
+                      as={`/post/edit/${post.id}`}
+                    >
+                      <IconButton
+                        as={Link}
+                        aria-label="Edit post"
+                        icon={<EditIcon />}
+                      />
+                    </NextLink>
                     <IconButton
-                      as={Link}
-                      aria-label="Edit post"
-                      icon={<EditIcon />}
+                      onClick={() => deletePost({ id: post.id })}
+                      aria-label="Delete post"
+                      icon={<DeleteIcon />}
                     />
-                  </NextLink>
-                  <IconButton
-                    onClick={() => deletePost({ id: post.id })}
-                    aria-label="Delete post"
-                    icon={<DeleteIcon />}
-                  />
-                </Flex>
+                  </Flex>
+                )}
               </Flex>
             )
           )}
