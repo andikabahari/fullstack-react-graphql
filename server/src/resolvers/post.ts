@@ -17,6 +17,7 @@ import { MyContext } from "../types";
 import { isAuth } from "../middlewares/isAuth";
 import { getConnection } from "typeorm";
 import { Upvote } from "../entities/Upvote";
+import { User } from "../entities/User";
 
 @InputType()
 class PostInput {
@@ -42,6 +43,11 @@ export class PostResolver {
   textSnippet(@Root() root: Post) {
     const text = root.text.slice(0, 100);
     return text + (text.length >= 100 ? "..." : "");
+  }
+
+  @FieldResolver(() => User)
+  creator(@Root() post: Post, @Ctx() { userLoader }: MyContext) {
+    return userLoader.load(post.creatorId);
   }
 
   @Mutation(() => Boolean)
@@ -94,20 +100,12 @@ export class PostResolver {
       `
         select
           p.*,
-          json_build_object(
-            'id', u.id,
-            'username', u.username,
-            'email', u.email,
-            'createdAt', u."createdAt",
-            'updatedAt', u."updatedAt"
-          ) creator,
           ${
             userId
               ? `(select value from upvote where "userId" = ${userId} and "postId" = p.id) "voteStatus"`
               : `null as "voteStatus"`
           }
         from post p
-        inner join public.user u on u.id = p."creatorId"
         ${cursor ? `where p."createdAt" < $2` : ""}
         order by p."createdAt" DESC
         limit $1
@@ -122,7 +120,7 @@ export class PostResolver {
 
   @Query(() => Post, { nullable: true })
   post(@Arg("id", () => Int) id: number): Promise<Post | undefined> {
-    return Post.findOne(id, { relations: ["creator"] });
+    return Post.findOne(id);
   }
 
   @Mutation(() => Post)
