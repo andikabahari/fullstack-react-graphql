@@ -15,7 +15,7 @@ import { createUrqlClient } from "../utils/createUrqlClient";
 import NextLink from "next/link";
 import { useState } from "react";
 import UpvoteSection from "../components/UpvoteSection";
-import { DeleteIcon } from "@chakra-ui/icons";
+import { DeleteIcon, EditIcon } from "@chakra-ui/icons";
 
 const Index = () => {
   const [variables, setVariables] = useState({
@@ -49,10 +49,15 @@ const Index = () => {
                   <Text mt={4}>{post.textSnippet}</Text>
                 </Box>
                 <Flex alignItems="center">
+                  <NextLink href="/post/edit/[id]" as={`/post/edit/${post.id}`}>
+                    <IconButton
+                      as={Link}
+                      aria-label="Edit post"
+                      icon={<EditIcon />}
+                    />
+                  </NextLink>
                   <IconButton
                     onClick={() => deletePost({ id: post.id })}
-                    colorScheme="red"
-                    variant="outline"
                     aria-label="Delete post"
                     icon={<DeleteIcon />}
                   />
