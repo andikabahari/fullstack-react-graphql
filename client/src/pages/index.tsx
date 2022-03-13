@@ -14,7 +14,7 @@ import { createUrqlClient } from "../utils/createUrqlClient";
 import NextLink from "next/link";
 import React, { useState } from "react";
 import UpvoteSection from "../components/UpvoteSection";
-import PostButtons from "../components/PostButtons";
+import { PostButtons } from "../components/PostButtons";
 
 const Index = () => {
   const [variables, setVariables] = useState({

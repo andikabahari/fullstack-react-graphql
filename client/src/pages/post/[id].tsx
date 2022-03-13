@@ -2,7 +2,7 @@ import { Box, Heading } from "@chakra-ui/react";
 import { withUrqlClient } from "next-urql";
 import React from "react";
 import Layout from "../../components/Layout";
-import PostButtons from "../../components/PostButtons";
+import { PostButtons } from "../../components/PostButtons";
 import { createUrqlClient } from "../../utils/createUrqlClient";
 import { useGetPost } from "../../utils/useGetPost";
 
