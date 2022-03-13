@@ -1,4 +1,5 @@
 import "reflect-metadata";
+import "dotenv-safe/config";
 import { COOKIE_NAME, __prod__ } from "./constants";
 import express from "express";
 import { ApolloServer } from "apollo-server-express";
@@ -27,9 +28,7 @@ declare module "express-session" {
 const main = async () => {
   const conn = await createConnection({
     type: "postgres",
-    database: "fullstack_react_graphql",
-    username: "postgres",
-    password: "root",
+    url: process.env.DATABASE_URL,
     logging: true,
     synchronize: true,
     migrations: [path.join(__dirname, "./migrations/*")],
@@ -39,9 +38,8 @@ const main = async () => {
   // await Post.delete({});
 
   const app = express();
-  const port = 5000;
 
-  // app.set("trust proxy", true);
+  app.set("proxy", 1);
 
   app.use(
     cors({
@@ -51,7 +49,7 @@ const main = async () => {
   );
 
   const RedisStore = connectRedist(session);
-  const redis = new Redis();
+  const redis = new Redis(process.env.REDIS_URL);
 
   const oneDay = 1000 * 60 * 60 * 24;
   const maxAge = 30 * oneDay;
@@ -67,9 +65,10 @@ const main = async () => {
         httpOnly: true,
         secure: __prod__, // https
         sameSite: __prod__ ? "lax" : "none", // csrf
+        // domain: __prod__ ? ".yourdomain" : undefined,
       },
       saveUninitialized: false,
-      secret: "keyboard cat",
+      secret: process.env.SESSION_SECRET,
       resave: false,
     })
   );
@@ -91,7 +90,9 @@ const main = async () => {
 
   apolloServer.applyMiddleware({ app, cors: false });
 
-  app.listen(port, () => console.log(`Server running on port ${port}`));
+  app.listen(process.env.PORT, () =>
+    console.log(`Server running on port ${process.env.PORT}`)
+  );
 };
 
 main().catch((err) => console.log(err));
