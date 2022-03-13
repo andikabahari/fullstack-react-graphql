@@ -43,7 +43,7 @@ const EditPost: React.FC<{}> = ({}) => {
         initialValues={{ title: data.post.title, text: data.post.text }}
         onSubmit={async (values, { setErrors }) => {
           await updatePost({ id: postId, ...values });
-          router.push("/");
+          router.back();
         }}
       >
         {({ isSubmitting }) => (
