@@ -3,16 +3,15 @@ import React from "react";
 import { Flex, IconButton, Link } from "@chakra-ui/react";
 import { useDeletePostMutation, useMeQuery } from "../generated/graphql";
 import NextLink from "next/link";
+import { withUrqlClient } from "next-urql";
+import { createUrqlClient } from "../utils/createUrqlClient";
 
 interface PostButtonsProps {
   postId: number;
   creatorId: number;
 }
 
-export const PostButtons: React.FC<PostButtonsProps> = ({
-  postId,
-  creatorId,
-}) => {
+const PostButtons: React.FC<PostButtonsProps> = ({ postId, creatorId }) => {
   const [, deletePost] = useDeletePostMutation();
   const [{ data: meData }] = useMeQuery();
 
@@ -33,3 +32,5 @@ export const PostButtons: React.FC<PostButtonsProps> = ({
     </Flex>
   );
 };
+
+export default withUrqlClient(createUrqlClient)(PostButtons);
