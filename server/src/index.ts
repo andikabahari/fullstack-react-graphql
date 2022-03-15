@@ -35,11 +35,10 @@ const main = async () => {
     entities: [Post, User, Upvote],
   });
   await conn.runMigrations();
-  // await Post.delete({});
 
   const app = express();
 
-  app.set("proxy", 1);
+  app.set("trust proxy", 1);
 
   app.use(
     cors({
