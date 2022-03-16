@@ -6,7 +6,11 @@ import { useRouter } from "next/router";
 import { useState } from "react";
 import InputField from "../../components/InputField";
 import Wrapper from "../../components/Wrapper";
-import { useChangePasswordMutation } from "../../generated/graphql";
+import {
+  MeDocument,
+  MeQuery,
+  useChangePasswordMutation,
+} from "../../generated/graphql";
 import { createUrqlClient } from "../../utils/createUrqlClient";
 import { toErrorMap } from "../../utils/toErrorMap";
 import NextLink from "next/link";
@@ -16,6 +20,7 @@ const ChangePassword: NextPage = () => {
   const router = useRouter();
   const [changePassword] = useChangePasswordMutation();
   const [tokenError, setTokenError] = useState("");
+
   return (
     <Wrapper variant="small">
       <Formik
@@ -29,13 +34,29 @@ const ChangePassword: NextPage = () => {
                   ? router.query.token
                   : "",
             },
+            update: (cache, { data }) => {
+              cache.writeQuery<MeQuery>({
+                query: MeDocument,
+                data: {
+                  __typename: "Query",
+                  me: data?.changePassword.user,
+                },
+              });
+              cache.evict({ fieldName: "posts" });
+            },
           });
           if (response.data?.changePassword.errors) {
             const errorMap = toErrorMap(response.data.changePassword.errors);
-            if ("token" in errorMap) setTokenError(errorMap.token);
+            if ("token" in errorMap) {
+              setTokenError(errorMap.token);
+            }
+
             setErrors(errorMap);
           }
-          if (response.data?.changePassword.user) router.push("/");
+
+          if (response.data?.changePassword.user) {
+            router.push("/");
+          }
         }}
       >
         {({ isSubmitting }) => (

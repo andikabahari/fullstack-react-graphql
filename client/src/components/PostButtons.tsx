@@ -27,7 +27,14 @@ export const PostButtons: React.FC<PostButtonsProps> = ({
         <IconButton as={Link} aria-label="Edit post" icon={<EditIcon />} />
       </NextLink>
       <IconButton
-        onClick={() => deletePost({ variables: { id: postId } })}
+        onClick={() => {
+          deletePost({
+            variables: { id: postId },
+            update: (cache) => {
+              cache.evict({ id: "Post:" + postId });
+            },
+          });
+        }}
         aria-label="Delete post"
         icon={<DeleteIcon />}
       />
