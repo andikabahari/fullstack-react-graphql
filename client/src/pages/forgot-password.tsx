@@ -6,6 +6,7 @@ import InputField from "../components/InputField";
 import Wrapper from "../components/Wrapper";
 import { useForgotPasswordMutation } from "../generated/graphql";
 import { createUrqlClient } from "../utils/createUrqlClient";
+import { withApolloClient } from "../utils/withApolloClient";
 
 interface ForgotPasswordProps {}
 
@@ -48,4 +49,4 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({}) => {
   );
 };
 
-export default ForgotPassword;
+export default withApolloClient({ ssr: false })(ForgotPassword);

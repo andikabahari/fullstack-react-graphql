@@ -8,6 +8,7 @@ import Layout from "../components/Layout";
 import { useCreatePostMutation } from "../generated/graphql";
 import { createUrqlClient } from "../utils/createUrqlClient";
 import { useIsAuth } from "../utils/useIsAuth";
+import { withApolloClient } from "../utils/withApolloClient";
 
 interface CreatePostProps {}
 
@@ -52,4 +53,4 @@ const CreatePost: React.FC<CreatePostProps> = ({}) => {
   );
 };
 
-export default CreatePost;
+export default withApolloClient({ ssr: false })(CreatePost);

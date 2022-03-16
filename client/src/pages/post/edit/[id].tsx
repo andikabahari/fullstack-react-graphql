@@ -11,6 +11,7 @@ import {
 } from "../../../generated/graphql";
 import { createUrqlClient } from "../../../utils/createUrqlClient";
 import { useGetPostId } from "../../../utils/useGetPostId";
+import { withApolloClient } from "../../../utils/withApolloClient";
 
 const EditPost: React.FC<{}> = ({}) => {
   const router = useRouter();
@@ -72,4 +73,4 @@ const EditPost: React.FC<{}> = ({}) => {
   );
 };
 
-export default EditPost;
+export default withApolloClient({ ssr: false })(EditPost);

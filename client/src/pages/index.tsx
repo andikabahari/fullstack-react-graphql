@@ -15,6 +15,7 @@ import NextLink from "next/link";
 import React, { useState } from "react";
 import UpvoteSection from "../components/UpvoteSection";
 import { PostButtons } from "../components/PostButtons";
+import { withApolloClient } from "../utils/withApolloClient";
 
 const Index = () => {
   const { data, loading, fetchMore, variables } = usePostsQuery({
@@ -81,4 +82,4 @@ const Index = () => {
   );
 };
 
-export default Index;
+export default withApolloClient({ ssr: true })(Index);

@@ -5,6 +5,7 @@ import Layout from "../../components/Layout";
 import { PostButtons } from "../../components/PostButtons";
 import { createUrqlClient } from "../../utils/createUrqlClient";
 import { useGetPost } from "../../utils/useGetPost";
+import { withApolloClient } from "../../utils/withApolloClient";
 
 const Post: React.FC<{}> = ({}) => {
   const { data, error, loading } = useGetPost();
@@ -38,4 +39,4 @@ const Post: React.FC<{}> = ({}) => {
   );
 };
 
-export default Post;
+export default withApolloClient({ ssr: true })(Post);
