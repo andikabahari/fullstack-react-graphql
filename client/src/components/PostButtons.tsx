@@ -14,8 +14,8 @@ export const PostButtons: React.FC<PostButtonsProps> = ({
   postId,
   creatorId,
 }) => {
-  const [, deletePost] = useDeletePostMutation();
-  const [{ data: meData }] = useMeQuery({ pause: isServer() });
+  const [deletePost] = useDeletePostMutation();
+  const { data: meData } = useMeQuery({ skip: isServer() });
 
   if (meData?.me?.id !== creatorId) {
     return null;
@@ -27,7 +27,7 @@ export const PostButtons: React.FC<PostButtonsProps> = ({
         <IconButton as={Link} aria-label="Edit post" icon={<EditIcon />} />
       </NextLink>
       <IconButton
-        onClick={() => deletePost({ id: postId })}
+        onClick={() => deletePost({ variables: { id: postId } })}
         aria-label="Delete post"
         icon={<DeleteIcon />}
       />
