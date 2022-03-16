@@ -15,13 +15,13 @@ import { useGetPostId } from "../../../utils/useGetPostId";
 const EditPost: React.FC<{}> = ({}) => {
   const router = useRouter();
   const postId = useGetPostId();
-  const [{ data, fetching }] = usePostQuery({
-    pause: postId === -1,
+  const { data, loading } = usePostQuery({
+    skip: postId === -1,
     variables: { id: postId },
   });
-  const [, updatePost] = useUpdatePostMutation();
+  const [updatePost] = useUpdatePostMutation();
 
-  if (fetching) {
+  if (loading) {
     return (
       <Layout>
         <div>loading...</div>
@@ -42,7 +42,7 @@ const EditPost: React.FC<{}> = ({}) => {
       <Formik
         initialValues={{ title: data.post.title, text: data.post.text }}
         onSubmit={async (values, { setErrors }) => {
-          await updatePost({ id: postId, ...values });
+          await updatePost({ variables: { id: postId, ...values } });
           router.back();
         }}
       >
@@ -72,4 +72,4 @@ const EditPost: React.FC<{}> = ({}) => {
   );
 };
 
-export default withUrqlClient(createUrqlClient)(EditPost);
+export default EditPost;

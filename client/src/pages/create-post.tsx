@@ -13,7 +13,7 @@ interface CreatePostProps {}
 
 const CreatePost: React.FC<CreatePostProps> = ({}) => {
   const router = useRouter();
-  const [, createPost] = useCreatePostMutation();
+  const [createPost] = useCreatePostMutation();
 
   useIsAuth();
 
@@ -22,8 +22,8 @@ const CreatePost: React.FC<CreatePostProps> = ({}) => {
       <Formik
         initialValues={{ title: "", text: "" }}
         onSubmit={async (values, { setErrors }) => {
-          const { error } = await createPost({ input: values });
-          if (!error) router.push("/");
+          const { errors } = await createPost({ variables: { input: values } });
+          if (!errors) router.push("/");
         }}
       >
         {({ isSubmitting }) => (
@@ -52,4 +52,4 @@ const CreatePost: React.FC<CreatePostProps> = ({}) => {
   );
 };
 
-export default withUrqlClient(createUrqlClient)(CreatePost);
+export default CreatePost;

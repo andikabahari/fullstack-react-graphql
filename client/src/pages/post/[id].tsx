@@ -7,9 +7,9 @@ import { createUrqlClient } from "../../utils/createUrqlClient";
 import { useGetPost } from "../../utils/useGetPost";
 
 const Post: React.FC<{}> = ({}) => {
-  const [{ data, error, fetching }] = useGetPost();
+  const { data, error, loading } = useGetPost();
 
-  if (fetching) {
+  if (loading) {
     return (
       <Layout>
         <div>loading...</div>
@@ -38,4 +38,4 @@ const Post: React.FC<{}> = ({}) => {
   );
 };
 
-export default withUrqlClient(createUrqlClient, { ssr: true })(Post);
+export default Post;
